@@ -20,7 +20,6 @@ const verifyJWT = (req, res, next) => {
       .send({ error: true, message: "unauthorized access" });
   }
   const token = authorization.split(" ")[1];
-  5;
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
@@ -77,7 +76,7 @@ const biodataCollection = client.db("matWebDb").collection("biodatas");
 
 app.post("/jwt", (req, res) => {
   const user = req.body;
-  const token = jwt.sign(quser, process.env.ACCESS_TOKEN_SECRET, {
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1h",
   });
 
@@ -85,7 +84,36 @@ app.post("/jwt", (req, res) => {
 });
 
 // ------------------------------------
-// varify jwt-------
+// amin api-------
+
+app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+  const email = req.params.email;
+
+  if (req.decoded.email !== email) {
+    res.send({ admin: false });
+  }
+
+  const query = { email: email };
+  const user = await usersCollection.findOne(query);
+  const result = { admin: user?.role === "admin" };
+  res.send(result);
+});
+
+// // ------------------------------------
+// // male api-------
+
+// app.get("/users/male/:email", verifyJWT, async (req, res) => {
+//   const email = req.params.email;
+
+//   if (req.decoded.email !== email) {
+//     res.send({ male: false });
+//   }
+
+//   const query = { email: email };
+//   const biodata = await biodataCollection.findOne(query);
+//   const result = { male: biodata?.biodata_type === "male" };
+//   res.send(result);
+// });
 
 // users apis
 
@@ -116,8 +144,8 @@ app.get("/biodata", async (req, res) => {
 });
 
 app.post("/biodata", async (req, res) => {
-  const newBiodata = req.body;
-  const result = await biodataCollection.insertOne(newBiodata);
+  const updatedData = req.body;
+  const result = await biodataCollection.insertOne(updatedData);
   res.send(result);
 });
 
@@ -132,7 +160,6 @@ app.patch("/users/admin/:id", async (req, res) => {
       role: "admin",
     },
   };
-
   const result = await usersCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
