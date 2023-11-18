@@ -136,7 +136,7 @@ app.post("/users", async (req, res) => {
 });
 
 // ----------------------------------
-// admin api
+// biodata api
 
 app.get("/biodata", async (req, res) => {
   const result = await biodataCollection.find().toArray();
@@ -146,6 +146,27 @@ app.get("/biodata", async (req, res) => {
 app.post("/biodata", async (req, res) => {
   const updatedData = req.body;
   const result = await biodataCollection.insertOne(updatedData);
+  res.send(result);
+});
+
+app.delete("/biodata/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await biodataCollection.deleteOne(query);
+  res.send(result);
+});
+
+// backend biodata approve api
+app.patch("/biodata/approve/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      status: "approved", // <-- Fix the typo here
+    },
+  };
+
+  const result = await biodataCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
 
