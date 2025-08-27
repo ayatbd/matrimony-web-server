@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
-const port = process.env.PORT || 5000;
 
 // midlwares
 app.use(cors());
@@ -63,10 +62,6 @@ run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("web server is running");
-});
-
-app.listen(port, () => {
-  console.log(`web server is running on port ${port}`);
 });
 
 const usersCollection = client.db("matWebDb").collection("users");
